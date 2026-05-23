@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Калькулятор продуктов</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        #parent {
+            margin: 0 auto;
+            width: 500px;
+        }
+        #form {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        #form input {
+            padding: 8px;
+            width: 24%;
+            margin: 0 0.5% 10px 0.5%;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 7px;
+        }
+        #table {
+            width: 100%;
+            margin-bottom: 10px;
+            border-collapse: collapse;
+        }
+        #table td, #table th {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid black;
+        }
+        #table td.remove {
+            color: blue;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #table td.remove:hover {
+            text-decoration: none;
+        }
+        #result {
+            text-align: right;
+            margin-right: 10px;
+        }
+        .edit-input {
+            width: 90%;
+            padding: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="parent">
+        <div id="form">
+            <input id="name" placeholder="название">
+            <input id="price" placeholder="цена">
+            <input id="amount" placeholder="количество">
+            <input id="add" type="button" value="добавить">
+        </div>
+        
+        <h2>Таблица продуктов:</h2>
+        <table id="table">
+            <tr>
+                <th>название</th>
+                <th>цена</th>
+                <th>кол-во</th>
+                <th>сумма</th>
+                <th>удалить</th>
+            </tr>
+        </table>
+        
+        <div id="result">
+            общий итог: <span id="total">0</span>
+        </div>
+    </div>
+
+    <script>
+        let name   = document.querySelector('#name');
+        let price  = document.querySelector('#price');
+        let amount = document.querySelector('#amount');
+        let add    = document.querySelector('#add');
+        let table  = document.querySelector('#table');
+        let total  = document.querySelector('#total');
+
+        function createCell(tr, value, className) {
+            let td = document.createElement('td');
+            td.textContent = value;
+            td.classList.add(className);
+            tr.appendChild(td);
+            return td;
+        }
+
+        // Функция для редактирования ячейки
+        function allowEdit(td) {
+            td.addEventListener('dblclick', function() {
+                let oldValue = td.textContent;
+                
+                // Создаём инпут
+                let input = document.createElement('input');
+                input.type = 'text';
+                input.value = oldValue;
+                input.classList.add('edit-input');
+                
+                // Очищаем ячейку и добавляем инпут
+                td.textContent = '';
+                td.appendChild(input);
+                input.focus();
+                
+                // Функция сохранения
+                function save() {
+                    let newValue = input.value.trim();
+                    if (newValue !== '') {
+                        td.textContent = newValue;
+                    } else {
+                        td.textContent = oldValue;
+                    }
+                }
+                
+                // Сохранение по Enter
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        save();
+                    }
+                });
+                
+                // Сохранение при потере фокуса
+                input.addEventListener('blur', function() {
+                    save();
+                });
+                
+                // Отмена по Escape
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        td.textContent = oldValue;
+                    }
+                });
+            });
+        }
+
+        // Функция пересчёта общей суммы
+        function recountTotal() {
+            let costs = table.querySelectorAll('.cost');
+            let sum = 0;
+            
+            for (let i = 0; i < costs.length; i++) {
+                let cost = parseFloat(costs[i].textContent);
+                if (!isNaN(cost)) {
+                    sum += cost;
+                }
+            }
+            
+            total.textContent = sum;
+        }
+
+        add.addEventListener('click', function() {
+            let productName = name.value.trim();
+            let productPrice = parseFloat(price.value);
+            let productAmount = parseFloat(amount.value);
+            
+            if (productName === '') {
+                alert('Введите название продукта');
+                return;
+            }
+            if (isNaN(productPrice) || productPrice < 0) {
+                alert('Введите корректную цену');
+                return;
+            }
+            if (isNaN(productAmount) || productAmount < 0) {
+                alert('Введите корректное количество');
+                return;
+            }
+            
+            let tr = document.createElement('tr');
+            
+            // Создаём ячейки и сразу добавляем им возможность редактирования
+            allowEdit(createCell(tr, productName, 'name'));
+            allowEdit(createCell(tr, productPrice, 'price'));
+            allowEdit(createCell(tr, productAmount, 'amount'));
+            createCell(tr, productPrice * productAmount, 'cost');
+            
+            // Удаление
+            createCell(tr, 'удалить', 'remove').addEventListener('click', function() {
+                tr.remove();
+                recountTotal();
+            });
+            
+            table.appendChild(tr);
+            
+            name.value = '';
+            price.value = '';
+            amount.value = '';
+            
+            recountTotal();
+        });
+        
+        name.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') add.click();
+        });
+        price.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') add.click();
+        });
+        amount.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') add.click();
+        });
+    </script>
+</body>
+</html>

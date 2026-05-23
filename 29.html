@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Калькулятор продуктов</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        #parent {
+            margin: 0 auto;
+            width: 500px;
+        }
+        #form {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        #form input {
+            padding: 8px;
+            width: 24%;
+            margin: 0 0.5% 10px 0.5%;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 7px;
+        }
+        #table {
+            width: 100%;
+            margin-bottom: 10px;
+            border-collapse: collapse;
+        }
+        #table td, #table th {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid black;
+        }
+        #table td.remove {
+            color: blue;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #table td.remove:hover {
+            text-decoration: none;
+        }
+        #result {
+            text-align: right;
+            margin-right: 10px;
+        }
+        .edit-input {
+            width: 90%;
+            padding: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="parent">
+        <div id="form">
+            <input id="name" placeholder="название">
+            <input id="price" placeholder="цена">
+            <input id="amount" placeholder="количество">
+            <input id="add" type="button" value="добавить">
+        </div>
+        
+        <h2>Таблица продуктов:</h2>
+        <table id="table">
+            <tr>
+                <th>название</th>
+                <th>цена</th>
+                <th>кол-во</th>
+                <th>сумма</th>
+                <th>удалить</th>
+            </table>
+        </table>
+        
+        <div id="result">
+            общий итог: <span id="total">0</span>
+        </div>
+    </div>
+
+    <script>
+        let name   = document.querySelector('#name');
+        let price  = document.querySelector('#price');
+        let amount = document.querySelector('#amount');
+        let add    = document.querySelector('#add');
+        let table  = document.querySelector('#table');
+        let total  = document.querySelector('#total');
+
+        function createCell(tr, value, className) {
+            let td = document.createElement('td');
+            td.textContent = value;
+            td.classList.add(className);
+            tr.appendChild(td);
+            return td;
+        }
+
+        // Функция для пересчёта общей суммы
+        function recountTotal() {
+            let costs = table.querySelectorAll('.cost');
+            let sum = 0;
+            
+            for (let i = 0; i < costs.length; i++) {
+                let cost = parseFloat(costs[i].textContent);
+                if (!isNaN(cost)) {
+                    sum += cost;
+                }
+            }
+            
+            total.textContent = sum;
+        }
+
+        // Функция для редактирования ячейки с перерасчётом
+        function allowEdit(td) {
+            td.addEventListener('dblclick', function() {
+                let oldValue = td.textContent;
+                td.textContent = '';
+                
+                let input = document.createElement('input');
+                input.value = oldValue;
+                input.classList.add('edit-input');
+                input.focus();
+                td.appendChild(input);
+                
+                input.addEventListener('keydown', function(event) {
+                    if (event.key == 'Enter') {
+                        let newValue = input.value.trim();
+                        
+                        // Проверяем, что введено не пустое значение
+                        if (newValue === '') {
+                            td.textContent = oldValue;
+                        } else {
+                            td.textContent = newValue;
+                        }
+                        
+                        // Если редактировали цену или количество
+                        if (td.classList.contains('price') || td.classList.contains('amount')) {
+                            // Получаем строку, в которой находится ячейка
+                            let row = td.parentNode;
+                            
+                            // Находим ячейки с ценой и количеством в этой строке
+                            let priceCell = row.querySelector('.price');
+                            let amountCell = row.querySelector('.amount');
+                            let costCell = row.querySelector('.cost');
+                            
+                            // Получаем значения цены и количества
+                            let priceVal = parseFloat(priceCell.textContent);
+                            let amountVal = parseFloat(amountCell.textContent);
+                            
+                            // Если оба значения корректные, пересчитываем стоимость
+                            if (!isNaN(priceVal) && !isNaN(amountVal)) {
+                                costCell.textContent = priceVal * amountVal;
+                            } else {
+                                costCell.textContent = 0;
+                            }
+                            
+                            // Пересчитываем общую сумму
+                            recountTotal();
+                        }
+                    }
+                });
+                
+                // Сохранение при потере фокуса
+                input.addEventListener('blur', function() {
+                    if (td.contains(input)) {
+                        td.textContent = oldValue;
+                    }
+                });
+            });
+        }
+
+        // Добавление продукта
+        add.addEventListener('click', function() {
+            let productName = name.value.trim();
+            let productPrice = parseFloat(price.value);
+            let productAmount = parseFloat(amount.value);
+            
+            if (productName === '') {
+                alert('Введите название продукта');
+                return;
+            }
+            if (isNaN(productPrice) || productPrice < 0) {
+                alert('Введите корректную цену');
+                return;
+            }
+            if (isNaN(productAmount) || productAmount < 0) {
+                alert('Введите корректное количество');
+                return;
+            }
+            
+            let tr = document.createElement('tr');
+            
+            allowEdit(createCell(tr, productName, 'name'));
+            allowEdit(createCell(tr, productPrice, 'price'));
+            allowEdit(createCell(tr, productAmount, 'amount'));
+            createCell(tr, productPrice * productAmount, 'cost');
+            
+            createCell(tr, 'удалить', 'remove').addEventListener('click', function() {
+                tr.remove();
+                recountTotal();
+            });
+            
+            table.appendChild(tr);
+            
+            name.value = '';
+            price.value = '';
+            amount.value = '';
+            
+            recountTotal();
+        });
+        
+        // Добавление по Enter
+        name.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') add.click();
+        });
+        price.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') add.click();
+        });
+        amount.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') add.click();
+        });
+    </script>
+</body>
+</html>

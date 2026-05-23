@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Калькулятор продуктов</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        #parent {
+            margin: 0 auto;
+            width: 500px;
+        }
+        #form {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        #form input {
+            padding: 8px;
+            width: 24%;
+            margin: 0 0.5% 10px 0.5%;
+        }
+        #table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #table td, #table th {
+            padding: 8px;
+            border: 1px solid black;
+            text-align: center;
+        }
+        #table td.remove {
+            color: blue;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #result {
+            text-align: right;
+            margin-top: 10px;
+        }
+        .edit-input {
+            width: 90%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="parent">
+        <div id="form">
+            <input id="name" placeholder="название">
+            <input id="price" placeholder="цена">
+            <input id="amount" placeholder="количество">
+            <input id="add" type="button" value="добавить">
+        </div>
+        
+        <table id="table">
+            <tr><th>название</th><th>цена</th><th>кол-во</th><th>сумма</th><th>удалить</th></tr>
+        </table>
+        
+        <div id="result">общий итог: <span id="total">0</span></div>
+    </div>
+
+    <script>
+        let name   = document.querySelector('#name');
+        let price  = document.querySelector('#price');
+        let amount = document.querySelector('#amount');
+        let add    = document.querySelector('#add');
+        let table  = document.querySelector('#table');
+        let total  = document.querySelector('#total');
+
+        // Обновление общей суммы
+        function updateTotal() {
+            let sum = 0;
+            for (let row of table.rows) {
+                if (row.rowIndex > 0) {
+                    sum += parseFloat(row.cells[3].textContent) || 0;
+                }
+            }
+            total.textContent = sum;
+        }
+
+        // Обновление суммы строки
+        function updateRow(row) {
+            let p = parseFloat(row.cells[1].textContent) || 0;
+            let a = parseFloat(row.cells[2].textContent) || 0;
+            row.cells[3].textContent = p * a;
+            updateTotal();
+        }
+
+        // Добавление продукта
+        add.onclick = function() {
+            let n = name.value.trim();
+            let p = parseFloat(price.value);
+            let a = parseFloat(amount.value);
+            
+            if (!n || isNaN(p) || isNaN(a)) {
+                alert('Заполните все поля');
+                return;
+            }
+            
+            let row = table.insertRow();
+            row.insertCell(0).textContent = n;
+            row.insertCell(1).textContent = p;
+            row.insertCell(2).textContent = a;
+            row.insertCell(3).textContent = p * a;
+            
+            let delCell = row.insertCell(4);
+            delCell.textContent = 'удалить';
+            delCell.className = 'remove';
+            delCell.onclick = () => { row.remove(); updateTotal(); };
+            
+            // Редактирование по двойному клику
+            for (let i = 0; i < 3; i++) {
+                let cell = row.cells[i];
+                cell.ondblclick = function() {
+                    let old = cell.textContent;
+                    let input = document.createElement('input');
+                    input.value = old;
+                    input.className = 'edit-input';
+                    cell.textContent = '';
+                    cell.appendChild(input);
+                    input.focus();
+                    
+                    input.onkeypress = (e) => {
+                        if (e.key === 'Enter') {
+                            let val = input.value.trim();
+                            if (i === 0) cell.textContent = val || old;
+                            else {
+                                let num = parseFloat(val);
+                                cell.textContent = (!isNaN(num) && num >= 0) ? num : old;
+                            }
+                            if (i > 0) updateRow(row);
+                        }
+                    };
+                    input.onblur = () => { cell.textContent = old; };
+                };
+            }
+            
+            name.value = price.value = amount.value = '';
+            updateTotal();
+        };
+        
+        // Добавление по Enter
+        [name, price, amount].forEach(inp => {
+            inp.onkeypress = (e) => { if (e.key === 'Enter') add.onclick(); };
+        });
+    </script>
+</body>
+</html>

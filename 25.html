@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Калькулятор продуктов</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        #parent {
+            margin: 0 auto;
+            width: 500px;
+        }
+        #form {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        #form input {
+            padding: 8px;
+            width: 24%;
+            margin: 0 0.5% 10px 0.5%;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 7px;
+        }
+        #table {
+            width: 100%;
+            margin-bottom: 10px;
+            border-collapse: collapse;
+        }
+        #table td, #table th {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid black;
+        }
+        #table td.remove {
+            color: blue;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #table td.remove:hover {
+            text-decoration: none;
+        }
+        #result {
+            text-align: right;
+            margin-right: 10px;
+        }
+        .edit-input {
+            width: 90%;
+            padding: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="parent">
+        <div id="form">
+            <input id="name" placeholder="название">
+            <input id="price" placeholder="цена">
+            <input id="amount" placeholder="количество">
+            <input id="add" type="button" value="добавить">
+        </div>
+        
+        <h2>Таблица продуктов:</h2>
+        <table id="table">
+            <tr>
+                <th>название</th>
+                <th>цена</th>
+                <th>кол-во</th>
+                <th>сумма</th>
+                <th>удалить</th>
+            </tr>
+        </table>
+        
+        <div id="result">
+            общий итог: <span id="total">0</span>
+        </div>
+    </div>
+
+    <script>
+        // Получаем ссылки на элементы
+        let name   = document.querySelector('#name');
+        let price  = document.querySelector('#price');
+        let amount = document.querySelector('#amount');
+        let add    = document.querySelector('#add');
+        let table  = document.querySelector('#table');
+        let total  = document.querySelector('#total');
+
+        // Функция создания ячейки
+        function createCell(tr, value, className) {
+            let td = document.createElement('td');
+            td.textContent = value;
+            td.classList.add(className);
+            tr.appendChild(td);
+            return td;
+        }
+
+        // Функция пересчёта общей суммы
+        function updateTotal() {
+            let rows = table.querySelectorAll('tr');
+            let sum = 0;
+            for (let i = 1; i < rows.length; i++) {
+                let sumCell = rows[i].cells[3];
+                let val = parseFloat(sumCell.textContent);
+                if (!isNaN(val)) {
+                    sum += val;
+                }
+            }
+            total.textContent = sum;
+        }
+
+        // Функция пересчёта суммы для одной строки
+        function updateRowSum(row) {
+            let priceCell = row.cells[1];
+            let amountCell = row.cells[2];
+            let sumCell = row.cells[3];
+            
+            let p = parseFloat(priceCell.textContent);
+            let a = parseFloat(amountCell.textContent);
+            
+            if (!isNaN(p) && !isNaN(a)) {
+                sumCell.textContent = p * a;
+            } else {
+                sumCell.textContent = 0;
+            }
+            
+            updateTotal();
+        }
+
+        // Функция для редактирования ячейки
+        function makeEditable(cell, row, colIndex) {
+            cell.addEventListener('dblclick', function() {
+                let oldValue = cell.textContent;
+                
+                let input = document.createElement('input');
+                input.type = 'text';
+                input.value = oldValue;
+                input.classList.add('edit-input');
+                
+                cell.textContent = '';
+                cell.appendChild(input);
+                input.focus();
+                
+                function save() {
+                    let newValue = input.value.trim();
+                    
+                    if (newValue === '') {
+                        cell.textContent = oldValue;
+                    } else {
+                        if (colIndex === 0) {
+                            cell.textContent = newValue;
+                        } else {
+                            let num = parseFloat(newValue);
+                            if (!isNaN(num) && num >= 0) {
+                                cell.textContent = num;
+                            } else {
+                                cell.textContent = oldValue;
+                            }
+                        }
+                    }
+                    
+                    if (colIndex !== 0) {
+                        updateRowSum(row);
+                    }
+                }
+                
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') save();
+                });
+                
+                input.addEventListener('blur', function() {
+                    save();
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        cell.textContent = oldValue;
+                    }
+                });
+            });
+        }
+
+        // Добавление продукта
+        add.addEventListener('click', function() {
+            let productName = name.value.trim();
+            let productPrice = parseFloat(price.value);
+            let productAmount = parseFloat(amount.value);
+            
+            if (productName === '') {
+                alert('Введите название продукта');
+                return;
+            }
+            if (isNaN(productPrice) || productPrice < 0) {
+                alert('Введите корректную цену');
+                return;
+            }
+            if (isNaN(productAmount) || productAmount < 0) {
+                alert('Введите корректное количество');
+                return;
+            }
+            
+            let tr = document.createElement('tr');
+            
+            let tdName = createCell(tr, productName, 'name');
+            let tdPrice = createCell(tr, productPrice, 'price');
+            let tdAmount = createCell(tr, productAmount, 'amount');
+            let tdSum = createCell(tr, productPrice * productAmount, 'cost');
+            
+            let tdRemove = createCell(tr, 'удалить', 'remove');
+            tdRemove.onclick = function() {
+                tr.remove();
+                updateTotal();
+            };
+            
+            table.appendChild(tr);
+            
+            makeEditable(tdName, tr, 0);
+            makeEditable(tdPrice, tr, 1);
+            makeEditable(tdAmount, tr, 2);
+            
+            name.value = '';
+            price.value = '';
+            amount.value = '';
+            
+            updateTotal();
+        });
+        
+        // Добавление по Enter
+        name.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') add.click();
+        });
+        price.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') add.click();
+        });
+        amount.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') add.click();
+        });
+    </script>
+</body>
+</html>

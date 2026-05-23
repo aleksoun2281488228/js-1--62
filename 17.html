@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Города с роботом</title>
+</head>
+<body>
+    <h2>Игра в города</h2>
+    <p>Начинай! <span id="needLetter">Любой город</span></p>
+    <input type="text" id="cityInput">
+    <button id="submitBtn">Ход</button>
+    <button id="resetBtn">Заново</button>
+    <hr>
+    <div id="history"></div>
+    <div id="message" style="color:red"></div>
+    <script>
+        // СПИСОК ГОРОДОВ (робот знает только эти)
+        let cities = ["Москва", "Астрахань", "Новгород", "Дели", "Ялта", "Анапа", "Афины"];
+        // ИГРА
+        let used = [];      // названные города
+        let lastLetter = ""; // на какую букву ждём
+        let gameOver = false;
+        // Получить последнюю букву (ь,ъ,ы -> предпоследняя)
+        function getLast(city) {
+            let last = city.slice(-1).toLowerCase();
+            if (last === "ь" || last === "ъ" || last === "ы") {
+                return city.slice(-2, -1).toLowerCase();
+            }
+            return last;
+        }
+        // Обновить экран
+        function refresh() {
+            let historyDiv = document.getElementById("history");
+            historyDiv.innerHTML = "<b>История:</b><br>";
+            for (let i = 0; i < used.length; i++) {
+                let кто = (i % 2 === 0) ? "Вы" : "Робот";
+                historyDiv.innerHTML += кто + ": " + used[i] + "<br>";
+            }
+            let needSpan = document.getElementById("needLetter");
+            if (lastLetter === "") needSpan.innerText = "Любой город";
+            else needSpan.innerText = "Букву '" + lastLetter.toUpperCase() + "'";
+        }
+        // Показать ошибку
+        function error(msg) {
+            let msgDiv = document.getElementById("message");
+            msgDiv.innerText = msg;
+            setTimeout(() => { msgDiv.innerText = ""; }, 1500);
+        }
+        // ХОД РОБОТА
+        function robotTurn() {
+            if (gameOver) return;
+            // Ищем подходящий город
+            let found = null;
+            for (let i = 0; i < cities.length; i++) {
+                let c = cities[i];
+                // Проверка: не использован
+                if (used.includes(c)) continue;
+                // Проверка: начинается на нужную букву
+                if (lastLetter !== "" && c[0].toLowerCase() !== lastLetter) continue;
+                found = c;
+                break;
+            }
+            if (found === null) {
+                document.getElementById("message").innerText = "🏆 Вы победили! Робот не может ходить.";
+                gameOver = true;
+                return;
+            }
+            // Робот ходит
+            used.push(found);
+            lastLetter = getLast(found);
+            refresh();
+            // Проверка, может ли человек ходить
+            let canHuman = false;
+            for (let i = 0; i < cities.length; i++) {
+                let c = cities[i];
+                if (used.includes(c)) continue;
+                if (lastLetter !== "" && c[0].toLowerCase() !== lastLetter) continue;
+                canHuman = true;
+                break;
+            }
+            if (!canHuman) {
+                document.getElementById("message").innerText = "🤖 Робот победил! Вам нечем ходить.";
+                gameOver = true;
+            }
+        }
+        // ХОД ЧЕЛОВЕКА
+        function humanTurn() {
+            if (gameOver) return;
+            let input = document.getElementById("cityInput");
+            let city = input.value.trim();
+            input.value = "";
+            if (city === "") {
+                error("Введите город!");
+                return;
+            }
+            // Приводим к формату: Первая буква заглавная
+            city = city[0].toUpperCase() + city.slice(1).toLowerCase();
+            // Проверка 1:  в списке?
+            if (!cities.includes(city)) {
+                error("Нет такого города в моём списке!");
+                return;
+            }
+            // Проверка 2: уже был?
+            if (used.includes(city)) {
+                error("Этот город уже называли!");
+                return;
+            }
+            // Проверка 3: буква?
+            if (lastLetter !== "" && city[0].toLowerCase() !== lastLetter) {
+                error("Город должен начинаться на '" + lastLetter.toUpperCase() + "'!");
+                return;
+            }
+            // Всё хорошо — ходим
+            used.push(city);
+            lastLetter = getLast(city);
+            refresh();
+            // Передаём ход роботу
+            setTimeout(robotTurn, 200);
+        }
+        // НОВАЯ ИГРА
+        function reset() {
+            used = [];
+            lastLetter = "";
+            gameOver = false;
+            document.getElementById("cityInput").value = "";
+            document.getElementById("message").innerText = "";
+            refresh();
+        }
+        // НАСТРАИВАЕМ КНОПКИ
+        document.getElementById("submitBtn").onclick = humanTurn;
+        document.getElementById("resetBtn").onclick = reset;
+        document.getElementById("cityInput").onkeypress = function(e) {
+            if (e.key === "Enter") humanTurn();
+        };
+        reset();
+    </script>
+</body>
+</html>

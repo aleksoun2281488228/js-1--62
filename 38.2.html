@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Слайдер</title>
+    <style>
+        a { font-size: 30px; margin: 20px; cursor: pointer; }
+        #slider { font-size: 24px; padding: 20px; border: 1px solid #000; display: inline-block; }
+    </style>
+</head>
+<body>
+
+<a id="left">←</a>
+<div id="slider"></div>
+<a id="right">→</a>
+
+<script>
+let texts = ['Раз', 'Два', 'Три'];
+let i = 0;
+
+let slider = document.getElementById('slider');
+slider.textContent = texts[i];
+
+left.onclick = function() {
+    if (i > 0) {
+        i--;
+        slider.textContent = texts[i];
+    }
+};
+
+right.onclick = function() {
+    if (i < texts.length - 1) {
+        i++;
+        slider.textContent = texts[i];
+    }
+};
+</script>
+
+</body>
+</html>

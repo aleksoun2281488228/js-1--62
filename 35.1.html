@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест</title>
+    <style>
+        .question { margin-bottom: 20px; }
+        label { margin-right: 15px; }
+        .right { background: lightgreen; }
+        .wrong { background: lightcoral; }
+        button { margin-top: 20px; padding: 5px 15px; }
+    </style>
+</head>
+<body>
+
+<h2>Тест</h2>
+
+<div id="test">
+    <div class="question">
+        <p>1. Столица Франции?</p>
+        <label><input type="radio" name="q1"> Берлин</label>
+        <label><input type="radio" name="q1"> Париж</label>
+        <label><input type="radio" name="q1"> Мадрид</label>
+    </div>
+    <div class="question">
+        <p>2. 2+2?</p>
+        <label><input type="radio" name="q2"> 3</label>
+        <label><input type="radio" name="q2"> 4</label>
+        <label><input type="radio" name="q2"> 5</label>
+    </div>
+    <div class="question">
+        <p>3. Цвет травы?</p>
+        <label><input type="radio" name="q3"> Синий</label>
+        <label><input type="radio" name="q3"> Красный</label>
+        <label><input type="radio" name="q3"> Зелёный</label>
+    </div>
+</div>
+
+<button id="btn">Проверить</button>
+<button onclick="resetAll()">Сброс</button>
+
+<script>
+// Номера правильных ответов (счет с 0)
+let answers = [1, 1, 2];
+
+document.getElementById('btn').onclick = function() {
+    let questions = document.querySelectorAll('#test .question');
+    
+    for (let i = 0; i < questions.length; i++) {
+        let radios = questions[i].querySelectorAll('input');
+        let right = answers[i];
+        let selected = -1;
+        
+        // Находим выбранный ответ
+        for (let j = 0; j < radios.length; j++) {
+            if (radios[j].checked) selected = j;
+            radios[j].parentElement.classList.remove('right', 'wrong');
+        }
+        
+        // Подсвечиваем
+        if (selected !== -1) {
+            if (selected === right) {
+                radios[selected].parentElement.classList.add('right');
+            } else {
+                radios[selected].parentElement.classList.add('wrong');
+                radios[right].parentElement.classList.add('right');
+            }
+        }
+    }
+};
+
+function resetAll() {
+    let all = document.querySelectorAll('input');
+    for (let i = 0; i < all.length; i++) {
+        all[i].checked = false;
+        all[i].parentElement.classList.remove('right', 'wrong');
+    }
+}
+</script>
+
+</body>
+</html>

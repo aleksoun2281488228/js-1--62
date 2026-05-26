@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Крестики-нолики</title>
+    <style>
+        #field td {
+            width: 50px;
+            height: 50px;
+            border: 1px solid black;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        table {
+            margin: 20px auto;
+        }
+        .status {
+            text-align: center;
+            margin: 10px;
+            font-size: 18px;
+        }
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 5px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<table id="field">
+    <tr>
+           <td></td>
+       <td></td><td></td>
+    </tr>
+    <tr>
+           <td></td>
+       <td></td><td></td>
+    </tr>
+    <tr>
+           <td></td>
+       <td></td><td></td>
+    </tr>
+</table>
+
+<div class="status" id="status">Ходит X</div>
+<button id="reset">Новая игра</button>
+
+<script>
+let cells = document.querySelectorAll('#field td');
+let statusDiv = document.getElementById('status');
+let resetBtn = document.getElementById('reset');
+
+let combs = [
+    [0,1,2], [3,4,5], [6,7,8],
+    [0,3,6], [1,4,7], [2,5,8],
+    [0,4,8], [2,4,6]
+];
+
+function isVictory(cells) {
+    for (let comb of combs) {
+        let a = comb[0], b = comb[1], c = comb[2];
+        if (cells[a].textContent !== '' &&
+            cells[a].textContent === cells[b].textContent &&
+            cells[b].textContent === cells[c].textContent) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function start(cells) {
+    let i = 0;
+    let gameOver = false;
+    
+    for (let cell of cells) {
+        cell.addEventListener('click', function step() {
+            if (gameOver) return;
+            if (this.textContent !== '') return;
+            
+            // Ставим X или O
+            this.textContent = ['X', 'O'][i % 2];
+            
+            // Проверяем победу
+            if (isVictory(cells)) {
+                statusDiv.textContent = `Победил ${this.textContent}!`;
+                gameOver = true;
+                return;
+            }
+            
+            // Проверяем ничью (если сделан 8-й ход, то после него будет 9 ячеек)
+            if (i === 8) {
+                statusDiv.textContent = 'Ничья!';
+                gameOver = true;
+                return;
+            }
+            
+            i++;
+            statusDiv.textContent = `Ходит ${['X', 'O'][i % 2]}`;
+        });
+    }
+}
+
+function resetGame() {
+    for (let cell of cells) {
+        cell.textContent = '';
+    }
+    statusDiv.textContent = 'Ходит X';
+    location.reload();
+}
+
+resetBtn.addEventListener('click', resetGame);
+start(cells);
+</script>
+
+</body>
+</html>

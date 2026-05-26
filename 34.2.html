@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест</title>
+    <style>
+        .question {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        label {
+            display: inline-block;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        .right {
+            background: lightgreen;
+        }
+        .wrong {
+            background: lightcoral;
+            text-decoration: line-through;
+        }
+        button {
+            margin-top: 20px;
+            padding: 8px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Тест</h2>
+
+<div id="test">
+    <div class="question">
+        <p>1. Столица Франции?</p>
+        <label><input type="radio" name="q1"> Берлин</label>
+        <label><input type="radio" name="q1" data-right> Париж</label>
+        <label><input type="radio" name="q1"> Мадрид</label>
+    </div>
+    <div class="question">
+        <p>2. 2+2?</p>
+        <label><input type="radio" name="q2"> 3</label>
+        <label><input type="radio" name="q2" data-right> 4</label>
+        <label><input type="radio" name="q2"> 5</label>
+    </div>
+    <div class="question">
+        <p>3. Цвет травы?</p>
+        <label><input type="radio" name="q3"> Синий</label>
+        <label><input type="radio" name="q3"> Красный</label>
+        <label><input type="radio" name="q3" data-right> Зелёный</label>
+    </div>
+</div>
+
+<button id="checkBtn">Проверить ответы</button>
+<button onclick="resetTest()" style="background: #6c757d; margin-left: 10px;">Сбросить</button>
+
+<script>
+// Находим все вопросы
+const questions = document.querySelectorAll('#test .question');
+const checkBtn = document.getElementById('checkBtn');
+
+// Функция проверки всех ответов
+function checkAll() {
+    questions.forEach(question => {
+        // Находим все радио в этом вопросе
+        const radios = question.querySelectorAll('input[type="radio"]');
+        
+        // Находим правильный ответ
+        let rightRadio = null;
+        for (let radio of radios) {
+            if (radio.hasAttribute('data-right')) {
+                rightRadio = radio;
+                break;
+            }
+        }
+        
+        // Находим выбранный ответ
+        let selectedRadio = null;
+        for (let radio of radios) {
+            if (radio.checked) {
+                selectedRadio = radio;
+                break;
+            }
+        }
+        
+        // Убираем старую подсветку
+        for (let radio of radios) {
+            radio.parentElement.classList.remove('right', 'wrong');
+        }
+        
+        // Если есть выбранный ответ
+        if (selectedRadio) {
+            if (selectedRadio === rightRadio) {
+                selectedRadio.parentElement.classList.add('right');
+            } else {
+                selectedRadio.parentElement.classList.add('wrong');
+                if (rightRadio) {
+                    rightRadio.parentElement.classList.add('right');
+                }
+            }
+        }
+    });
+}
+
+// Вешаем обработчик на кнопку
+checkBtn.addEventListener('click', checkAll);
+
+// Сброс
+function resetTest() {
+    const allRadios = document.querySelectorAll('#test input[type="radio"]');
+    allRadios.forEach(radio => {
+        radio.checked = false;
+        radio.parentElement.classList.remove('right', 'wrong');
+    });
+}
+</script>
+
+</body>
+</html>

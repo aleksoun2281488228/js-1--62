@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Календарь</title>
+    <style>
+        td, th {
+            padding: 8px 15px;
+            border: 1px solid black;
+            text-align: center;
+        }
+        table {
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+
+<table id="cal">
+    <thead><tr><th>пн</th><th>вт</th><th>ср</th><th>чт</th><th>пт</th><th>сб</th><th>вс</th></tr></thead>
+    <tbody id="body"></tbody>
+</table>
+
+<script>
+function draw(body, year, month) {
+    let firstDay = new Date(year, month, 1);
+    let start = firstDay.getDay();
+    start = start === 0 ? 6 : start - 1;
+    
+    let daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    let html = [];
+    let day = 1;
+    
+    for (let i = 0; i < 6; i++) {
+        let row = [];
+        for (let j = 0; j < 7; j++) {
+            if (i === 0 && j < start) {
+                row.push('');
+            } else if (day > daysInMonth) {
+                row.push('');
+            } else {
+                row.push(day);
+                day++;
+            }
+        }
+        html.push(row);
+        if (day > daysInMonth) break;
+    }
+    
+    body.innerHTML = '';
+    for (let i = 0; i < html.length; i++) {
+        let tr = document.createElement('tr');
+        for (let j = 0; j < html[i].length; j++) {
+            let td = document.createElement('td');
+            td.textContent = html[i][j];
+            tr.appendChild(td);
+        }
+        body.appendChild(tr);
+    }
+}
+
+let now = new Date();
+let body = document.getElementById('body');
+draw(body, now.getFullYear(), now.getMonth());
+</script>
+
+</body>
+</html>

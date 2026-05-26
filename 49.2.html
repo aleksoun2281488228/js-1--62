@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Игра</title>
+    <style>
+        td {
+            width: 50px;
+            height: 50px;
+            border: 1px solid black;
+            cursor: pointer;
+        }
+        .red { background: red; }
+        .green { background: green; }
+        .blue { background: blue; }
+        table { margin: 20px auto; }
+    </style>
+</head>
+<body>
+
+<table id="field"></table>
+
+<script>
+let colors = ['red', 'green', 'blue'];
+
+function nextColor(currentColor) {
+    let index = colors.indexOf(currentColor);
+    let nextIndex = (index + 1) % colors.length;
+    return colors[nextIndex];
+}
+
+let field = document.getElementById('field');
+
+for (let i = 0; i < 3; i++) {
+    let tr = document.createElement('tr');
+    for (let j = 0; j < 3; j++) {
+        let td = document.createElement('td');
+        let randomColor = colors[Math.floor(Math.random() * 3)];
+        td.classList.add(randomColor);
+        
+        td.onclick = function() {
+            let current = this.className;
+            let newColor = nextColor(current);
+            this.className = newColor;
+        };
+        
+        tr.appendChild(td);
+    }
+    field.appendChild(tr);
+}
+</script>
+
+</body>
+</html>

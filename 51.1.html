@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Игра</title>
+    <style>
+        td {
+            width: 50px;
+            height: 50px;
+            border: 1px solid black;
+            cursor: pointer;
+        }
+        .red { background: red; }
+        .green { background: green; }
+        .blue { background: blue; }
+        table { margin: 20px auto; }
+    </style>
+</head>
+<body>
+
+<div style="text-align:center">Кликов: <span id="c">0</span></div>
+<table id="f"><tr>
+
+<script>
+let colors = ['red', 'green', 'blue'];
+let clicks = 0;
+
+function next(c) {
+    let i = colors.indexOf(c);
+    return colors[(i+1)%3];
+}
+
+function check() {
+    let all = document.querySelectorAll('#f td');
+    let first = all[0].className;
+    for (let i=1; i<all.length; i++)
+        if (all[i].className !== first) return false;
+    return true;
+}
+
+let f = document.getElementById('f');
+for (let i=0; i<3; i++) {
+    let tr = document.createElement('tr');
+    for (let j=0; j<3; j++) {
+        let td = document.createElement('td');
+        td.className = colors[Math.floor(Math.random()*3)];
+        td.onclick = function() {
+            this.className = next(this.className);
+            document.getElementById('c').innerHTML = ++clicks;
+            if (check()) alert('Победа!');
+        };
+        tr.appendChild(td);
+    }
+    f.appendChild(tr);
+}
+</script>
+
+</body>
+</html>

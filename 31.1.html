@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест с массивом ответов</title>
+    <style>
+        /* Простые стили */
+        .question {
+            margin-bottom: 15px;
+        }
+        input {
+            width: 300px;
+            padding: 5px;
+            border: 2px solid gray;
+        }
+        .right {
+            border-color: green;
+            background: lightgreen;
+        }
+        .wrong {
+            border-color: red;
+            background: lightcoral;
+        }
+        button {
+            margin-top: 20px;
+            padding: 5px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h2>Тест</h2>
+<div id="test">
+    <div class="question">
+        <p>1. Какая столица Франции?</p>
+        <input type="text">
+    </div>
+    <div class="question">
+        <p>2. Сколько будет 2 + 2?</p>
+        <input type="text">
+    </div>
+    <div class="question">
+        <p>3. Какого цвета трава?</p>
+        <input type="text">
+    </div>
+    <button id="button">Проверить ответы</button>
+    <button onclick="resetColors()">Сбросить</button>
+</div>
+<script>
+    // Массив с правильными ответами (порядок совпадает с вопросами)
+    let answers = [
+        'Париж',
+        '4',
+        'зеленый'
+    ];
+    // Находим все поля ввода внутри теста
+    const inputs = document.querySelectorAll('#test input');
+    // Функция проверки всех ответов
+    function checkAll() {
+        // Проходим по каждому полю ввода
+        inputs.forEach((input, index) => {
+            // Берём ответ пользователя и убираем лишние пробелы
+            const userAnswer = input.value.trim();
+            // Берём правильный ответ из массива (по тому же индексу)
+            const rightAnswer = answers[index];
+            // Удаляем старые классы
+            input.classList.remove('right', 'wrong');
+            
+            // Сравниваем без учёта регистра
+            if (userAnswer.toLowerCase() === rightAnswer.toLowerCase()) {
+                input.classList.add('right');   // Зелёный — правильно
+            } else {
+                input.classList.add('wrong');   // Красный — неправильно
+            }
+        });
+    }
+    // Вешаем обработчик на кнопку
+    const button = document.getElementById('button');
+    button.addEventListener('click', checkAll);
+
+    // Сброс: убираем цвета и очищаем поля
+    function resetColors() {
+        inputs.forEach(input => {
+            input.classList.remove('right', 'wrong');
+            input.value = '';
+        });
+    }
+</script>
+
+</body>
+</html>

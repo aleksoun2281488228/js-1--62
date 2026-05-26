@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Крестики-нолики</title>
+    <style>
+        #field td {
+            width: 50px;
+            height: 50px;
+            border: 1px solid black;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        table {
+            margin: 20px auto;
+        }
+        .turn {
+            text-align: center;
+            margin: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<table id="field">
+    <tr>
+        <td></td>
+       <td></td><td></td>
+    </tr>
+    <tr>
+         <td></td>
+       <td></td><td></td>
+    </tr>
+    <tr>
+       <td></td>
+       <td></td><td></td>
+    </tr>
+</table>
+
+<div class="turn" id="turn">Ходит X</div>
+
+<script>
+let cells = document.querySelectorAll('#field td');
+let turnDiv = document.getElementById('turn');
+
+function start(cells) {
+    let i = 0;
+    
+    for (let cell of cells) {
+        cell.addEventListener('click', function() {
+            // Если ячейка уже занята - ничего не делаем
+            if (this.textContent !== '') return;
+            
+            // Ставим X или O
+            this.textContent = ['X', 'O'][i % 2];
+            
+            // Меняем текст
+            turnDiv.textContent = (i % 2 === 0) ? 'Ходит O' : 'Ходит X';
+            
+            i++;
+        });
+    }
+}
+
+start(cells);
+</script>
+
+</body>
+</html>

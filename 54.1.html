@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Календарь</title>
+    <style>
+        #calendar {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        #calendar td, #calendar th {
+            padding: 8px 15px;
+            border: 1px solid black;
+            text-align: center;
+        }
+        #calendar th {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+
+<table id="calendar">
+    <thead>
+        <tr>
+            <th>пн</th><th>вт</th><th>ср</th><th>чт</th><th>пт</th><th>сб</th><th>вс</th>
+        </tr>
+    </thead>
+    <tbody id="body"></tbody>
+</table>
+
+<script>
+function getFirstWeekDay(year, month) {
+    let firstDay = new Date(year, month, 1);
+    let day = firstDay.getDay();
+    return day === 0 ? 6 : day - 1;
+}
+
+function getLastDay(year, month) {
+    return new Date(year, month + 1, 0).getDate();
+}
+
+let now = new Date();
+let year = now.getFullYear();
+let month = now.getMonth();
+
+let start = getFirstWeekDay(year, month);
+let daysInMonth = getLastDay(year, month);
+
+let html = '';
+let day = 1;
+
+for (let i = 0; i < 6; i++) {
+    html += '<tr>';
+    for (let j = 0; j < 7; j++) {
+        if (i === 0 && j < start) {
+            html += '<td></td>';
+        } else if (day > daysInMonth) {
+            html += '<td></td>';
+        } else {
+            html += '<td>' + day + '</td>';
+            day++;
+        }
+    }
+    html += '</tr>';
+    if (day > daysInMonth) break;
+}
+
+document.getElementById('body').innerHTML = html;
+</script>
+
+</body>
+</html>

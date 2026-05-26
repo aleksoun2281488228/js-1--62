@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест</title>
+    <style>
+        /* Простые стили */
+        .question {
+            margin-bottom: 15px;
+        }
+        input {
+            width: 300px;
+            padding: 5px;
+            border: 2px solid gray;
+        }
+        .right {
+            border-color: green;
+            background: lightgreen;
+        }
+        .wrong {
+            border-color: red;
+            background: lightcoral;
+        }
+        button {
+            margin-top: 20px;
+            padding: 5px 15px;
+        }
+    </style>
+</head>
+<body>
+<h2>Тест (нажми Enter)</h2>
+<div id="test">
+    <div class="question">
+        <p>1. Столица Франции?</p>
+        <!-- data-right хранит правильный ответ -->
+        <input type="text" data-right="Париж">
+    </div>
+    <div class="question">
+        <p>2. 2+2?</p>
+        <input type="text" data-right="4">
+    </div>
+    <div class="question">
+        <p>3. Цвет травы?</p>
+        <input type="text" data-right="зеленый">
+    </div>
+</div>
+<button onclick="resetColors()">Сбросить</button>
+<script>
+    // Находим все поля ввода
+    const inputs = document.querySelectorAll('#test input');
+    // Функция проверки одного поля
+    function checkInput(input) {
+        // Берём правильный ответ из атрибута data-right
+        const right = input.getAttribute('data-right');
+        // Берём ответ пользователя и убираем лишние пробелы
+        const user = input.value.trim();
+        // Удаляем старые классы (зелёный/красный)
+        input.classList.remove('right', 'wrong');
+        // Сравниваем без учёта регистра (большие/маленькие буквы)
+        if (user.toLowerCase() === right.toLowerCase()) {
+            input.classList.add('right');   // Зелёная рамка
+        } else {
+            input.classList.add('wrong');   // Красная рамка
+        }
+    }
+    // Вешаем обработчик на каждое поле
+    inputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+            // Если нажали Enter
+            if (e.key === 'Enter') {
+                checkInput(this);  // Проверяем это поле
+            }
+        });
+    });
+    // Сброс: убираем цвета и очищаем поля
+    function resetColors() {
+        inputs.forEach(input => {
+            input.classList.remove('right', 'wrong');
+            input.value = '';
+        });
+    }
+</script>
+
+</body>
+</html>

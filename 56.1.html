@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Календарь</title>
+    <style>
+        #calendar {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        #calendar td, #calendar th {
+            padding: 8px 15px;
+            border: 1px solid black;
+            text-align: center;
+        }
+        #calendar th {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+
+<table id="calendar">
+    <thead>
+        <tr>
+            <th>пн</th><th>вт</th><th>ср</th><th>чт</th><th>пт</th><th>сб</th><th>вс</th>
+        </tr>
+    </thead>
+    <tbody id="body"></tbody>
+</table>
+
+<script>
+function range(count) {
+    let arr = [];
+    for (let i = 1; i <= count; i++) {
+        arr.push(i);
+    }
+    return arr;
+}
+
+function getLastDay(year, month) {
+    return new Date(year, month + 1, 0).getDate();
+}
+
+function getFirstWeekDay(year, month) {
+    let firstDay = new Date(year, month, 1);
+    let day = firstDay.getDay();
+    return day === 0 ? 6 : day - 1;
+}
+
+function getLastWeekDay(year, month) {
+    let lastDay = new Date(year, month + 1, 0);
+    let day = lastDay.getDay();
+    return day === 0 ? 6 : day - 1;
+}
+
+function normalize(arr, left, right) {
+    // Добавляем пустые строки слева
+    for (let i = 0; i < left; i++) {
+        arr.unshift('');
+    }
+    // Добавляем пустые строки справа
+    for (let i = 0; i < right; i++) {
+        arr.push('');
+    }
+    return arr;
+}
+
+let now = new Date();
+let year = now.getFullYear();
+let month = now.getMonth();
+
+let arr = range(getLastDay(year, month));
+let firstWeekDay = getFirstWeekDay(year, month);
+let lastWeekDay = getLastWeekDay(year, month);
+
+let res = normalize(arr, firstWeekDay, 6 - lastWeekDay);
+console.log(res);
+
+// Вывод в таблицу
+let html = '';
+for (let i = 0; i < res.length; i += 7) {
+    html += '<tr>';
+    for (let j = i; j < i + 7; j++) {
+        html += '<td>' + res[j] + '</td>';
+    }
+    html += '</tr>';
+}
+
+document.getElementById('body').innerHTML = html;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест</title>
+    <style>
+        .question { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; }
+        label { margin-right: 15px; }
+        .right { background: lightgreen; }
+        .wrong { background: lightcoral; }
+        button { margin-top: 20px; padding: 5px 15px; }
+    </style>
+</head>
+<body>
+
+<h2>Тест</h2>
+<div id="test"></div>
+<button id="button">Проверить</button>
+<button onclick="reset()">Сброс</button>
+
+<script>
+let questions = [
+    { text: 'Столица Франции?', right: 1, variants: ['Берлин', 'Париж', 'Мадрид'] },
+    { text: '2+2?', right: 1, variants: ['3', '4', '5'] },
+    { text: 'Цвет травы?', right: 2, variants: ['Синий', 'Красный', 'Зелёный'] }
+];
+
+let test = document.getElementById('test');
+let allRadios = [];
+
+// Создаём тест
+for (let i = 0; i < questions.length; i++) {
+    let q = questions[i];
+    let div = document.createElement('div');
+    div.className = 'question';
+    div.innerHTML = '<p>' + (i+1) + '. ' + q.text + '</p>';
+    
+    for (let j = 0; j < q.variants.length; j++) {
+        div.innerHTML += '<label><input type="radio" name="q'+i+'"> ' + q.variants[j] + '</label>';
+        allRadios.push(div.lastChild.firstChild);
+    }
+    test.appendChild(div);
+}
+
+// Проверка
+document.getElementById('button').onclick = function() {
+    let divs = document.querySelectorAll('#test .question');
+    for (let i = 0; i < divs.length; i++) {
+        let radios = divs[i].querySelectorAll('input');
+        let right = questions[i].right;
+        let selected = -1;
+        
+        for (let j = 0; j < radios.length; j++) {
+            radios[j].parentElement.classList.remove('right', 'wrong');
+            if (radios[j].checked) selected = j;
+        }
+        
+        if (selected !== -1) {
+            if (selected === right) {
+                radios[selected].parentElement.classList.add('right');
+            } else {
+                radios[selected].parentElement.classList.add('wrong');
+                radios[right].parentElement.classList.add('right');
+            }
+        }
+    }
+};
+
+// Сброс
+function reset() {
+    for (let i = 0; i < allRadios.length; i++) {
+        allRadios[i].checked = false;
+        allRadios[i].parentElement.classList.remove('right', 'wrong');
+    }
+}
+</script>
+
+</body>
+</html>

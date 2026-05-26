@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест</title>
+    <style>
+        .question { margin-bottom: 15px; }
+        input { width: 250px; padding: 5px; border: 2px solid gray; }
+        .right { border-color: green; background: lightgreen; }
+        .wrong { border-color: red; background: lightcoral; }
+        button { margin-top: 20px; padding: 5px 15px; }
+    </style>
+</head>
+<body>
+
+<h2>Тест</h2>
+<div id="test"></div>
+<button id="button">Проверить</button>
+<button onclick="reset()">Сброс</button>
+
+<script>
+// Массивы вопросов и ответов
+let questions = ['Столица Франции?', '2+2?', 'Цвет травы?'];
+let answers = ['Париж', '4', 'зеленый'];
+
+let testDiv = document.getElementById('test');
+let inputs = [];
+
+// Создаём вопросы и инпуты
+for (let i = 0; i < questions.length; i++) {
+    let div = document.createElement('div');
+    div.className = 'question';
+    div.innerHTML = '<p>' + (i+1) + '. ' + questions[i] + '</p><input type="text">';
+    testDiv.appendChild(div);
+    inputs.push(div.querySelector('input'));
+}
+
+// Проверка
+document.getElementById('button').onclick = function() {
+    for (let i = 0; i < inputs.length; i++) {
+        let user = inputs[i].value.trim().toLowerCase();
+        let right = answers[i].toLowerCase();
+        inputs[i].classList.remove('right', 'wrong');
+        inputs[i].classList.add(user === right ? 'right' : 'wrong');
+    }
+};
+
+// Сброс
+function reset() {
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].classList.remove('right', 'wrong');
+        inputs[i].value = '';
+    }
+}
+</script>
+
+</body>
+</html>

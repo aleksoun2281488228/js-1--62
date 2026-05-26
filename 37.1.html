@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Слайдер текста</title>
+    <style>
+        #slider {
+            font-size: 24px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background: #f0f0f0;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="slider"></div>
+
+<script>
+// Массив текстов
+let texts = ['Привет!', 'Как дела?', 'Добро пожаловать!', 'JavaScript', 'Слайдер работает!'];
+
+let slider = document.getElementById('slider');
+let index = 0;
+
+// Показываем первый текст сразу
+slider.textContent = texts[index];
+
+// Запускаем таймер (каждую секунду меняем текст)
+setInterval(function() {
+    index++; // переходим к следующему тексту
+    
+    // Если дошли до конца массива, возвращаемся в начало
+    if (index >= texts.length) {
+        index = 0;
+    }
+    
+    // Меняем текст в слайдере
+    slider.textContent = texts[index];
+}, 1000); // 1000 миллисекунд = 1 секунда
+</script>
+
+</body>
+</html>

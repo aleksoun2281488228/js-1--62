@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест (объект)</title>
+    <style>
+        .question { margin-bottom: 15px; }
+        input { width: 250px; padding: 5px; border: 2px solid gray; }
+        .right { border-color: green; background: lightgreen; }
+        .wrong { border-color: red; background: lightcoral; }
+        button { margin-top: 20px; padding: 5px 15px; }
+    </style>
+</head>
+<body>
+
+<h2>Тест</h2>
+<div id="test"></div>
+<button id="button">Проверить</button>
+<button onclick="reset()">Сброс</button>
+
+<script>
+// Объект с вопросами и ответами (вопрос: ответ)
+let questions = {
+    'Столица Франции?': 'Париж',
+    'Сколько будет 2 + 2?': '4',
+    'Какого цвета трава?': 'зеленый',
+    'Язык программирования для веба?': 'JavaScript'
+};
+
+let testDiv = document.getElementById('test');
+let inputs = [];
+let questionTexts = [];
+
+// Перебираем объект
+for (let questionText in questions) {
+    // Сохраняем вопрос и ответ
+    questionTexts.push(questionText);
+    
+    // Создаём HTML
+    let div = document.createElement('div');
+    div.className = 'question';
+    div.innerHTML = '<p>' + questionText + '</p><input type="text">';
+    testDiv.appendChild(div);
+    
+    // Сохраняем инпут
+    inputs.push(div.querySelector('input'));
+}
+
+// Проверка ответов
+document.getElementById('button').onclick = function() {
+    for (let i = 0; i < inputs.length; i++) {
+        let user = inputs[i].value.trim().toLowerCase();
+        let right = questions[questionTexts[i]].toLowerCase();
+        
+        inputs[i].classList.remove('right', 'wrong');
+        inputs[i].classList.add(user === right ? 'right' : 'wrong');
+    }
+};
+
+// Сброс
+function reset() {
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].classList.remove('right', 'wrong');
+        inputs[i].value = '';
+    }
+}
+</script>
+
+</body>
+</html>
